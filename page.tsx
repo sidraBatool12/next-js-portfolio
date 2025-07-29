@@ -1,73 +1,140 @@
-// src/app/about/page.tsx
+'use client';
 
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import Image from "next/image";
+import { useRef, useState } from 'react';
+import emailjs from '@emailjs/browser';
+import { Mail, User, MessageSquare, Send, CheckCircle, XCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-export default function AboutMePage() {
+export default function ContactPage() {
+  const form = useRef<HTMLFormElement>(null);
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
+  const sendEmail = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setSuccess(null);
+    setError(null);
+    setStatus('sending');
+
+    if (!form.current) return;
+
+    emailjs
+      .sendForm(
+        'service_1hb7nds',
+        'template_h3gcvqr',
+        form.current,
+        '9Kdgvo-RzGdz4LXDF'
+      )
+      .then(
+        () => {
+          setSuccess('Message sent successfully! 🎉');
+          setStatus('sent');
+          form.current?.reset();
+          setLoading(false);
+        },
+        () => {
+          setError('Oops! Something went wrong. Please try again.');
+          setStatus('error');
+          setLoading(false);
+        }
+      );
+  };
+
   return (
-    <>
-      {/* <Navbar /> */}
+    <section className="max-w-3xl mx-auto p-8 bg-[#001233] rounded-xl shadow-lg text-white min-h-[80vh]">
+      <h2 className="text-4xl font-bold mb-5 text-center">Get in Touch</h2>
+      <h1 className='mt-  text-center text-white mb-10'>Because great conversations lead to amazing collaborations.</h1>
 
-      <div className="relative min-h-screen bg-[url('/bg.jpg')] bg-cover bg-center rounded-xl">
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-[#001233] bg-opacity-70 backdrop-blur-md" />
+      <form
+        ref={form}
+        onSubmit={sendEmail}
+        className="flex flex-col gap-6"
+        noValidate
+      >
+        {/* Name Field */}
+        <label className="block ">
+          <span className="flex items-center gap-2 mb-2 text-blue-400">
+            <User size={20} /> Name
+          </span>
+          <input
+            required
+            type="text"
+            name="user_name"
+            placeholder="Your Name"
+            className="w-full px-4 py-3 rounded border-blue-300 bg-[#001a4d]  border-1 transition 
+            hover:shadow-[0_0_10px_2px_rgba(59,130,246,0.9)]"
+          />
+        </label>
 
-        <div className="relative z-10 text-gray-100">
-          {/* Hero Section */}
-          <section className="max-w-6xl mx-auto px-6 sm:px-12 py-16 flex flex-col-reverse md:flex-row items-center gap-8">
-            <div className="md:w-2/3 text-center md:text-left">
-              <h1 className="text-3xl sm:text-4xl font-bold mb-4">Hi, I’m Sidra Batool 👋</h1>
-              <p className="text-base sm:text-lg leading-relaxed">
-                I'm a passionate <strong>Full Stack Developer</strong> with a love for building elegant and scalable web applications. With a background in design and development, I combine creativity and logic to create user-centric digital experiences.
-              </p>
-              <p className="mt-4 text-base sm:text-lg leading-relaxed">
-                From frontend interfaces to backend systems, I specialize in technologies like <strong>Next.js, React, Node.js, TypeScript, and Tailwind CSS</strong>. I'm also a tech mentor and lifelong learner, constantly improving and helping others grow.
-              </p>
-            </div>
-            <div className="md:w-1/3 flex justify-center">
-              <Image
-                src="/profile.jpg"
-                alt="Profile"
-                width={300}
-                height={300}
-                className="rounded-full  object-cover w-40 h-40 sm:w-60 sm:h-60 border-4 border-blue-300   shadow-[0_0_15px_5px_rgba(59,130,246,0.7)]"
-              />
-            </div>
-          </section>
+        {/* Email Field */}
+        <label className="block">
+          <span className="flex items-center gap-2 mb-2 text-blue-400">
+            <Mail size={20} /> Email
+          </span>
+          <input
+            required
+            type="email"
+            name="user_email"
+            placeholder="Your Email"
+            className="w-full px-4 py-3 rounded border-blue-300 bg-[#001a4d] placeholder-blue-300 border-1 transition 
+            hover:shadow-[0_0_10px_2px_rgba(59,130,246,0.9)]"
+          />
+        </label>
 
-          {/* Skills Section */}
-          <section className="bg-[#001233] bg-opacity-90 rounded-xl max-w-6xl mx-auto py-12 px-6 sm:px-8 my-12">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-8 text-center text-white">My Skills</h2>
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {[
-                "Next.js", "React.js", "TypeScript", "Tailwind CSS",
-                "Node.js", "MongoDB", "REST & APIs", "Git & GitHub", "UI/UX Design",
-              ].map((skill) => (
-                <div
-                  key={skill}
-                  className="bg-[#01214d] rounded-xl p-6 border border-blue-600 shadow-[0_0_8px_2px_rgba(59,130,246,0.7)] transition"
-                >
-                  <h4 className="text-base sm:text-lg font-semibold text-center text-sky-300">{skill}</h4>
-                </div>
-              ))}
-            </div>
-          </section>
+        {/* Message Field */}
+        <label className="block">
+          <span className="flex items-center gap-2 mb-2 text-blue-400">
+            <MessageSquare size={20} /> Message
+          </span>
+          <textarea
+            required
+            name="message"
+            placeholder="Your Message"
+            rows={5}
+            className="w-full px-4 py-3 rounded border-blue-300 bg-[#001a4d] placeholder-blue-300 border-1 transition 
+            hover:shadow-[0_0_10px_2px_rgba(59,130,246,0.9)]"
+          />
+        </label>
 
-          {/* Mission Section */}
-          <section className="max-w-4xl mx-auto px-6 sm:px-8 py-12 space-y-6 bg-[#001233] bg-opacity-60 backdrop-blur-md rounded-xl">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center text-white">Why I Do What I Do</h2>
-            <p className="text-base sm:text-lg text-center text-sky-300 leading-relaxed">
-              I believe that clean, accessible, and efficient code can change the way we interact with the digital world. My mission is to build tools and products that make people’s lives easier, businesses smarter, and experiences more delightful.
-            </p>
-            <p className="text-base sm:text-lg text-center text-sky-300 leading-relaxed">
-              When I’m not coding, you’ll find me exploring design trends, mentoring aspiring developers, or diving into personal growth.
-            </p>
-          </section>
-        </div>
-      </div>
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className={`flex items-center justify-center gap-2 bg-blue-1000 text-white border border-blue-300 py-3 rounded font-semibold transition relative overflow-hidden  shadow-[0_0_10px_rgba(0,0,255,0.6)]
+            ${
+              loading ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-[inset_0_0_25px_rgba(0,0,255,0.6)]'
+            }`}
+        >
+          <motion.span
+            initial={{ x: 0 }}
+            animate={{
+              rotate: status === 'sending' ? 360 : 0,
+              x: status === 'sent' ? 50 : 0,
+            }}
+            transition={{
+              duration: status === 'sending' ? 0.8 : 0.5,
+              repeat: status === 'sending' ? Infinity : 0,
+            }}
+            className="inline-block"
+          >
+            {status === 'sent' ? (
+              <CheckCircle size={20} className="text-green-400" />
+            ) : status === 'error' ? (
+              <XCircle size={20} className="text-red-400" />
+            ) : (
+              <Send size={20} />
+            )}
+          </motion.span>
+          {loading ? 'Sending...' : 'Send Message'}
+        </button>
 
-      {/* <Footer /> */}
-    </>
+        {/* Status Message */}
+        {success && <p className="text-green-400 text-center mt-2 font-semibold">{success}</p>}
+        {error && <p className="text-red-400 text-center mt-2 font-semibold">{error}</p>}
+      </form>
+    </section>
   );
 }
